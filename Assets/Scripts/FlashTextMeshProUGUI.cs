@@ -8,7 +8,6 @@ public class FlashTextMeshProUGUI : MonoBehaviour {
     public float interval = 0.5f;
     float nextTime;
     TextMeshProUGUI textmeshPro;
-    float alpha = 0;
     // Use this for initialization
     void Start () {
         if (interval <= 0f) {
@@ -16,7 +15,6 @@ public class FlashTextMeshProUGUI : MonoBehaviour {
             nextTime = interval;
         }
         textmeshPro = GetComponent<TextMeshProUGUI>();
-        alpha = 0;
     }
 
     // Update is called once per frame
