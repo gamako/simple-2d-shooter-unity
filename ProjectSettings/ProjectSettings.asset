@@ -613,7 +613,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: 1536a7d4-465c-4ada-bb2f-cc4adfac8172
   projectName: simple-2d-shooter
   organizationId: sugama-tatsuo
