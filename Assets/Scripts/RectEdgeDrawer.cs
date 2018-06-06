@@ -28,7 +28,7 @@ public class RectEdgeDrawer : MonoBehaviour {
         var bottomLeft = new Vector3(rect.xMin, rect.yMin);
         var bottomRight = new Vector3(rect.xMax, rect.yMin);
 
-        Vector3[] positions = new[] {topLeft, topRight, bottomRight, bottomLeft, topLeft};
+        Vector3[] positions = new[] {topLeft, topRight, bottomRight, bottomLeft};
         lineRenderer.positionCount = positions.Length;
         lineRenderer.SetPositions(positions);
     }
