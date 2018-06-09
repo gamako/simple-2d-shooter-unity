@@ -34,7 +34,7 @@ public class Shot : MonoBehaviour {
 
 			// パーティクルを発生
 			particleObject.transform.localPosition = other.transform.localPosition;
-			particle.Emit(10);
+			particle.Emit(40);
 
 			// 自分も削除
 			Destroy(this.gameObject);
