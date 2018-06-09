@@ -644,6 +644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: 2
   shotPrefab: {fileID: 1267005790}
+  mainCameraObj: {fileID: 0}
 --- !u!50 &1372713953
 Rigidbody2D:
   serializedVersion: 4
@@ -773,7 +774,7 @@ ParticleSystem:
   lengthInSec: 0.77
   simulationSpeed: 1
   stopAction: 0
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -842,7 +843,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 0.6
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -894,9 +895,9 @@ ParticleSystem:
         m_RotationOrder: 4
     startSpeed:
       serializedVersion: 2
-      minMaxState: 0
-      scalar: 5
-      minScalar: 5
+      minMaxState: 3
+      scalar: 10
+      minScalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1536,7 +1537,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 9.54
+      scalar: 100
       minScalar: 10
       maxCurve:
         serializedVersion: 2

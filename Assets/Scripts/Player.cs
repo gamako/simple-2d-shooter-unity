@@ -13,8 +13,12 @@ public class Player : MonoBehaviour {
 
     public GameObject shotPrefab;
 
+    [SerializeField] private GameObject mainCameraObj;
+    private Camera mainCamera;
+
     void Start () {
         fireAxis = new AxisChange("Fire1");
+        mainCamera = mainCameraObj.GetComponent<Camera>();
     }
 
     void Update () {
@@ -24,10 +28,18 @@ public class Player : MonoBehaviour {
         var v = Input.GetAxis(verticalAxis);
 
         var old = transform.localPosition;
-        transform.localPosition = new Vector3(
+        var newPosition = new Vector3(
             old.x + h * delta * Speed,
             old.y + v * delta * Speed,
             old.z);
+
+        // 画面端に出ないようにする
+        var topLeft = mainCamera.ViewportToWorldPoint(new Vector2(0,0));
+        var bottomRight = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
+        newPosition.x = Mathf.Clamp(newPosition.x, topLeft.x, bottomRight.x);
+        newPosition.y = Mathf.Clamp(newPosition.y, topLeft.y, bottomRight.y);
+        
+        transform.localPosition = newPosition;
 
         // shot入力チェック
         fireAxis.Update();
