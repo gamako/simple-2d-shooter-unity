@@ -36,8 +36,9 @@ public class Enemy : MonoBehaviour {
     public void damaged(int num) {
 
         // パーティクルを発生
+        // Emitとposition変更の順番を逆にするとうまくいかない
+        particle.Emit(100);
         particleObject.transform.localPosition = transform.localPosition;
-        particle.Emit(200000);
 
         Destroy(this.gameObject);
     }
