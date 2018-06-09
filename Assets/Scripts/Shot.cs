@@ -6,17 +6,32 @@ public class Shot : MonoBehaviour {
 
 	public Vector3 deltaVector = new Vector3(10, 0, 0); 
 
-	private Renderer renderer;
+	private Renderer renderer_;
 	void Start () {
-		renderer = GetComponent<Renderer>();
+		renderer_ = GetComponent<Renderer>();
 	}
 
 	void Update () {
 		var delta = Time.deltaTime;
 		transform.localPosition += deltaVector * delta;
 
-		if (!renderer.isVisible) {
+		if (!renderer_.isVisible) {
     		Destroy(this.gameObject);
   		}
 	}
+    void OnTriggerEnter2D(Collider2D other) {
+        
+		if (other.tag == "enemy") {
+			Enemy e = other.GetComponent<Enemy>();
+			if (e == null) {
+				Debug.Log("can't find enemy component");
+			}
+			// 相手オブジェクトを削除し
+			e.damaged(1);
+
+			// 自分も削除
+			Destroy(this.gameObject);
+		}
+		
+    }
 }
