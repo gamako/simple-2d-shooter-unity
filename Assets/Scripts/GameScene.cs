@@ -27,7 +27,7 @@ public class GameScene : MonoBehaviour {
             var y = Random.Range(0, 1.0f); // y位置をランダムで決める
             var p = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
             p.z = 0;
-            var o = Instantiate (enemyPrefab, p, Quaternion.identity);
+            Instantiate (enemyPrefab, p, Quaternion.identity);
 
 
         }
