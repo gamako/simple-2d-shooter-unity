@@ -44,7 +44,9 @@ public class Player : MonoBehaviour {
         // shot入力チェック
         fireAxis.Update();
         if (fireAxis.ChangePositive) {
-            
+            var c = GetComponent<Animator>();
+            c.SetTrigger("shot-trig");
+            c.SetBool("shot", true);
             var shotPosition = transform.localPosition;
             shotPosition.x += 0.8f;
             shotPosition.y += 0.05f;
