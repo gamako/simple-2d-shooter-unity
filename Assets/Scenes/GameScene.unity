@@ -1094,6 +1094,7 @@ GameObject:
   - component: {fileID: 1365547508}
   - component: {fileID: 1365547507}
   - component: {fileID: 1365547504}
+  - component: {fileID: 1365547509}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1169,7 +1170,7 @@ CircleCollider2D:
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_UsedByEffector: 0
+  m_UsedByEffector: 1
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -1188,6 +1189,16 @@ MonoBehaviour:
   Speed: 1
   shotPrefab: {fileID: 1267005790}
   mainCameraObj: {fileID: 660580716}
+--- !u!210 &1365547509
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1365547503}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!1 &1390084646
 GameObject:
   m_ObjectHideFlags: 0
