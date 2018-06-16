@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour {
 	public GameObject particleObject;
 	ParticleSystem particle;
 
-    public Vector3 delta = new Vector3(-1, 0);
+    public Vector3 delta = new Vector3(-3, 0);
 
 	private Renderer[] renderers;
 
