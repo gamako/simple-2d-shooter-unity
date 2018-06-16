@@ -49,7 +49,6 @@ public class Player : MonoBehaviour {
             c.SetBool("shot", true);
             var shotPosition = transform.localPosition;
             shotPosition.x += 0.8f;
-            shotPosition.y += 0.05f;
             // プレハブからインスタンスを生成
             Instantiate (shotPrefab, shotPosition, Quaternion.identity);
         }

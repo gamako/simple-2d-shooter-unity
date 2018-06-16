@@ -20,13 +20,6 @@ public class Enemy : MonoBehaviour {
     void Update () {
         var dletaTime = Time.deltaTime;
 
-        // 画面外に出たら削除
-        bool isVisible = renderers.Aggregate(false, (acc, r) => { return r.isVisible || acc;  });
-        if (!isVisible) {
-            Destroy(this.gameObject);
-            return;
-        }
-
         // 移動
         transform.localPosition += delta * dletaTime;
     }

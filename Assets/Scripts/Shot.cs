@@ -17,10 +17,6 @@ public class Shot : MonoBehaviour {
 	void Update () {
 		var delta = Time.deltaTime;
 		transform.localPosition += deltaVector * delta;
-
-		if (!renderer_.isVisible) {
-    		Destroy(this.gameObject);
-  		}
 	}
     void OnTriggerEnter2D(Collider2D other) {
         
