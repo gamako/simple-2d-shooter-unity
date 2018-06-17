@@ -30,6 +30,11 @@ public class Shot : MonoBehaviour {
 
 			// 自分も削除
 			Destroy(this.gameObject);
+		} else if (other.tag == "PowerUp") {
+
+			PowerBlock p = other.GetComponent<PowerBlock>();
+			p.OnDamaged(this.GetComponent<Collider2D>());
+			Destroy(this.gameObject);
 		}
 		
     }
