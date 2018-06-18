@@ -25,6 +25,7 @@ public class PowerBlock : MonoBehaviour {
             if (t > 1) {
                 t = 1;
             }
+            t = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Back, EasingLerps.EasingInOutType.EaseOut, t, 0, 1);
             
             // 右下を中心に回転する
             var m = 
@@ -32,6 +33,8 @@ public class PowerBlock : MonoBehaviour {
             * Matrix4x4.Rotate(Quaternion.Euler(0,0,-90f * t))
             * Matrix4x4.Translate(new Vector3(-rollingStartPosition.x - size.x/2, -rollingStartPosition.y + size.y/2, 0))
             * startMatrix;
+
+
 
             transform.localPosition = m.ExtractPosition();
             transform.localRotation = m.ExtractRotation();
