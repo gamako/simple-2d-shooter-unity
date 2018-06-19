@@ -11,66 +11,40 @@ public class PowerBlock : MonoBehaviour {
     float rollingDuration = 1;
     
     Vector3 rollingStartPosition;
+    Vector3 speed;
+    float rotationSpeed;
 
     void Start() {
         isRolling = false;
         //startRolling();
     }
 
+    float gravityLeft = -3;
+
     void Update() {
+        var delta = Time.deltaTime;
+        var currentR = transform.localEulerAngles;
 
-        if (isRolling) {
-            float t = (Time.time - startTime) / rollingDuration;
-
-            if (t > 1) {
-                t = 1;
-            }
-            t = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Back, EasingLerps.EasingInOutType.EaseOut, t, 0, 1);
-            
-            // 右下を中心に回転する
-            var m = 
-            Matrix4x4.Translate(new Vector3(rollingStartPosition.x + size.x/2, rollingStartPosition.y - size.y/2, 0))
-            * Matrix4x4.Rotate(Quaternion.Euler(0,0,-90f * t))
-            * Matrix4x4.Translate(new Vector3(-rollingStartPosition.x - size.x/2, -rollingStartPosition.y + size.y/2, 0))
-            * startMatrix;
-
-
-
-            transform.localPosition = m.ExtractPosition();
-            transform.localRotation = m.ExtractRotation();
-            transform.localScale = m.ExtractScale();
-
-            if (t == 1) {
-                isRolling = false;
-                OnEndRolling();
-            }
+        speed.x = Mathf.Clamp(speed.x + delta * gravityLeft, -5, 5);
+        var currentRz = currentR.z;
+        if (rotationSpeed > 0) {
+            rotationSpeed -= 1;
+        } else if (rotationSpeed < 0) {
+            rotationSpeed += 1;
         }
 
+        transform.localPosition += speed * delta;
+        var newR = currentR;
+        newR.z += rotationSpeed * delta;
+        transform.localRotation = Quaternion.Euler(newR);
     }
 
     void OnTriggerEnter2D(Collider2D other) {
     }
 
     public void OnDamaged(Collider2D other) {
-        if (isRolling) {
-            rollingDuration *= 0.8f;
-        } else {
-            startRolling();
-        }
-    }
-
-    void startRolling() {
-        startTime = Time.time;
-        var col = GetComponent<BoxCollider2D>();
-        size = col.size;
-
-        // 回転の初期状態を表す行列
-        startMatrix = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
-
-        isRolling = true;
-        rollingDuration = 0.5f;
-
-        rollingStartPosition = transform.localPosition;
+        speed.x += 5;
+        rotationSpeed += 90;
     }
 
     void OnEndRolling() {
