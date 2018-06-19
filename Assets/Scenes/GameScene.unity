@@ -384,6 +384,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e75681782590a4e0caa2a72e24616415, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spritePlain: {fileID: 21300000, guid: a7e39581be2174a26be4e42dd7f504ad, type: 3}
+  spriteSpeedUp: {fileID: 21300000, guid: 6eb8057e96bd64f618c6406950e05331, type: 3}
+  spriteTwinShot: {fileID: 21300000, guid: fedbf62b1da384b7ebcb107d887cbe40, type: 3}
+  spriteTripleShot: {fileID: 21300000, guid: 23b9c1155e4604c08b8683f1e63617d3, type: 3}
+  spriteOption: {fileID: 21300000, guid: 7ecb8bd41bab64ef38c4556088a80d3d, type: 3}
 --- !u!1 &467560818
 GameObject:
   m_ObjectHideFlags: 0

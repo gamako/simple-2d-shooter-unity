@@ -14,12 +14,23 @@ public class PowerBlock : MonoBehaviour {
     Vector3 speed;
     float rotationSpeed;
 
+    float gravityLeft = -3;
+
+    int shotCount = 0;
+    SpriteRenderer spriteRenderer;
+
+    [SerializeField] private Sprite spritePlain;
+    [SerializeField] private Sprite spriteSpeedUp;
+    [SerializeField] private Sprite spriteTwinShot;
+    [SerializeField] private Sprite spriteTripleShot;
+    [SerializeField] private Sprite spriteOption;
+
     void Start() {
         isRolling = false;
-        //startRolling();
-    }
+        shotCount = 0;
 
-    float gravityLeft = -3;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     void Update() {
         var delta = Time.deltaTime;
@@ -45,6 +56,27 @@ public class PowerBlock : MonoBehaviour {
     public void OnDamaged(Collider2D other) {
         speed.x += 5;
         rotationSpeed += 90;
+        shotCount += 1;
+
+        switch (shotCount) {
+        case 5:
+            spriteRenderer.sprite = spriteSpeedUp;
+            break;
+        case 10:
+            spriteRenderer.sprite = spriteTwinShot;
+            break;
+        case 20:
+            spriteRenderer.sprite = spriteTripleShot;
+            break;
+        case 30:
+            spriteRenderer.sprite = spriteOption;
+            break;
+        default:
+            Debug.Log($"spritePlain: {spritePlain}");
+            spriteRenderer.sprite = spritePlain;
+            break;
+        }
+
     }
 
     void OnEndRolling() {
