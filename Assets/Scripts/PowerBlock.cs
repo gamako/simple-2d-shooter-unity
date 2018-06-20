@@ -102,7 +102,6 @@ public class PowerBlock : MonoBehaviour {
             type_ = PoweUpType.Option;
             break;
         default:
-            Debug.Log($"spritePlain: {spritePlain}");
             spriteRenderer.sprite = spritePlain;
             type_ = PoweUpType.Plain;
             break;

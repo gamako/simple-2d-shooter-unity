@@ -12,11 +12,14 @@ public class Player : MonoBehaviour {
     public float Speed = 1f;
 
     public GameObject shotPrefab;
+    [SerializeField] private  GameObject fishOptionPrefab;
 
     [SerializeField] private GameObject mainCameraObj;
     private Camera mainCamera;
 
     [SerializeField] private ShotType shotMode;
+
+    List<FishOption> fishOptions;
 
     enum ShotType {
         Normal,
@@ -27,7 +30,9 @@ public class Player : MonoBehaviour {
     void Start () {
         fireAxis = new AxisChange("Fire1");
         mainCamera = mainCameraObj.GetComponent<Camera>();
+        fishOptions = new List<FishOption>();
 
+        createOption();
     }
 
     void Update () {
@@ -88,11 +93,14 @@ public class Player : MonoBehaviour {
 
                 break;
         }
+
+        fishOptions.ForEach(o => {
+            o.shot();
+        });
     }
 
     void PowerUp(PowerBlock po) {
         PowerBlock.PoweUpType type = po.Type;
-        Debug.Log($"PowerUp ... {type}");
 
         switch (type) {
             case PowerBlock.PoweUpType.Plain:
@@ -107,6 +115,7 @@ public class Player : MonoBehaviour {
                 shotMode = ShotType.Triple;
                 break;
             case PowerBlock.PoweUpType.Option:
+                createOption();
                 break;
         }
     }
@@ -116,5 +125,13 @@ public class Player : MonoBehaviour {
             PowerUp(other.GetComponent<PowerBlock>());
             Destroy(other.gameObject);
         }
+    }
+
+    void createOption() {
+        var o = Instantiate(fishOptionPrefab, transform.localPosition, Quaternion.identity);
+        var fishOption = o.GetComponent<FishOption>();
+        fishOptions.Add(fishOption);
+        fishOption.PlayerObj = this;
+        fishOption.positionNum = fishOptions.Count * 15;
     }
 }
