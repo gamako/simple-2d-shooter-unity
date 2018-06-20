@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PowerBlock : MonoBehaviour {
 
+    [SerializeField] private Camera mainCamera;
+
     bool isRolling;
     float startTime = 0f;
     Matrix4x4 startMatrix;
@@ -19,17 +21,36 @@ public class PowerBlock : MonoBehaviour {
     int shotCount = 0;
     SpriteRenderer spriteRenderer;
 
+    float deadLine = 0f;
+
     [SerializeField] private Sprite spritePlain;
     [SerializeField] private Sprite spriteSpeedUp;
     [SerializeField] private Sprite spriteTwinShot;
     [SerializeField] private Sprite spriteTripleShot;
     [SerializeField] private Sprite spriteOption;
 
+    public enum PoweUpType {
+        Plain,
+        SpeedUp,
+        TwinShot,
+        TripleShot,
+        Option,
+    }
+    PoweUpType type_;
+
+    public PoweUpType Type {
+        get { return type_; }
+    }
+
+
     void Start() {
         isRolling = false;
         shotCount = 0;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
+        type_ = PoweUpType.Plain;
+
+        deadLine = mainCamera.ViewportToWorldPoint(new Vector2(0,0)).x - 1;
     }
 
     void Update() {
@@ -48,6 +69,11 @@ public class PowerBlock : MonoBehaviour {
         var newR = currentR;
         newR.z += rotationSpeed * delta;
         transform.localRotation = Quaternion.Euler(newR);
+
+        // 画面左に行ったら消す
+        if (transform.localPosition.x < deadLine) {
+            Destroy(this.gameObject);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other) {
@@ -61,19 +87,24 @@ public class PowerBlock : MonoBehaviour {
         switch (shotCount) {
         case 5:
             spriteRenderer.sprite = spriteSpeedUp;
+            type_ = PoweUpType.SpeedUp;
             break;
         case 10:
             spriteRenderer.sprite = spriteTwinShot;
+            type_ = PoweUpType.TwinShot;
             break;
         case 20:
             spriteRenderer.sprite = spriteTripleShot;
+            type_ = PoweUpType.TripleShot;
             break;
         case 30:
             spriteRenderer.sprite = spriteOption;
+            type_ = PoweUpType.Option;
             break;
         default:
             Debug.Log($"spritePlain: {spritePlain}");
             spriteRenderer.sprite = spritePlain;
+            type_ = PoweUpType.Plain;
             break;
         }
 

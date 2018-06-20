@@ -8,10 +8,13 @@ public class GameScene : MonoBehaviour {
 
     private Camera mainCamera;
     private float nextEnemySpawnTime;
+    private float nextPowerUpSpawnTime;
 
     public float enemySpawnInterval = 3;
+    public float powerUpSpawnInterval = 4;
 
-    public GameObject enemyPrefab;
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject powerUpPrefab;
 
     [SerializeField] private GameObject player;
 
@@ -20,6 +23,8 @@ public class GameScene : MonoBehaviour {
         GameObject mainCameraObj = GameObject.Find ("Main Camera");
         mainCamera = mainCameraObj.GetComponent<Camera>();
         nextEnemySpawnTime = Time.time + enemySpawnInterval;
+        nextPowerUpSpawnTime = Time.time + powerUpSpawnInterval;
+
     }
     
     // Update is called once per frame
@@ -27,14 +32,11 @@ public class GameScene : MonoBehaviour {
         var t = Time.time;
         if (t > nextEnemySpawnTime) {
             nextEnemySpawnTime = t + enemySpawnInterval;
-
-            // 敵キャラクターを画面端出現
-            // var y = Random.Range(0, 1.0f); // y位置をランダムで決める
-            // var p = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
-            // p.z = 0;
-            // Instantiate (enemyPrefab, p, Quaternion.identity);
             spawnThree(3);
-
+        }
+        if (t > nextPowerUpSpawnTime) {
+            nextPowerUpSpawnTime = t + powerUpSpawnInterval;
+            spawnPoweUp();
         }
     }
 
@@ -43,9 +45,6 @@ public class GameScene : MonoBehaviour {
 
         var screenRightTop = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
         var screenLeftBottom = mainCamera.ViewportToWorldPoint(new Vector2(0,0));
-
-        Debug.Log($"screenRightTop: ${screenRightTop}");
-        Debug.Log($"screenLeftBottom: ${screenLeftBottom}");
 
         var verticalCenter = (screenRightTop.y + screenLeftBottom.y)/2;
 
@@ -66,5 +65,16 @@ public class GameScene : MonoBehaviour {
                 await Task.Delay(700);
             } 
         });
+    }
+
+    void spawnPoweUp() {
+        var screenRightTop = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
+        var screenLeftBottom = mainCamera.ViewportToWorldPoint(new Vector2(0,0));
+
+        var y = Random.Range(0, 1.0f);
+        var spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
+        spawnPoint.z = 0;
+        Instantiate (powerUpPrefab, spawnPoint, Quaternion.identity);
+         
     }
 }
