@@ -25,7 +25,10 @@ public class Enemy : MonoBehaviour {
     }
 
     void OnTriggerEnter2D(Collider2D other) {
-        // Debug.Log("Enemy.OnTriggerEnter2D");
+        if (other.tag == "Player") {
+            var p = other.GetComponent<Player>();
+            p.OnDamage();
+        }
     }
 
     public void damaged(int num) {

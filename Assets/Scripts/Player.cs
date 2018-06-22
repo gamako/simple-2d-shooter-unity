@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour {
 
@@ -21,6 +24,9 @@ public class Player : MonoBehaviour {
 
     List<FishOption> fishOptions;
 
+	[SerializeField] GameObject particleObject;
+    ParticleSystem particle;
+
     enum ShotType {
         Normal,
         Twin,
@@ -28,6 +34,8 @@ public class Player : MonoBehaviour {
     }
 
     void Start () {
+		particle = particleObject.GetComponent<ParticleSystem>();
+
         fireAxis = new AxisChange("Fire1");
         mainCamera = mainCameraObj.GetComponent<Camera>();
         fishOptions = new List<FishOption>();
@@ -133,5 +141,26 @@ public class Player : MonoBehaviour {
         fishOptions.Add(fishOption);
         fishOption.PlayerObj = this;
         fishOption.positionNum = fishOptions.Count * 15;
+    }
+
+    public void OnDamage() {
+        particle.Emit(100);
+        particleObject.transform.localPosition = transform.localPosition;
+
+        // Playerを参照している箇所があるので、Destroyしてはいけない
+        this.gameObject.SetActive(false);
+
+        fishOptions.ForEach(opt => {
+            opt.enabled = false;
+        });
+
+        var context = SynchronizationContext.Current;
+
+        Task.Run(async() => {
+            await Task.Delay(2000);
+            context.Post((state) => {
+                SceneManager.LoadScene("GameOverScene");
+            }, null);
+        });
     }
 }

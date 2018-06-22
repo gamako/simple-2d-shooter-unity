@@ -18,6 +18,8 @@ public class GameScene : MonoBehaviour {
 
     [SerializeField] private GameObject player;
 
+    CancellationTokenSource cancellationTokenSource;
+
     // Use this for initialization
     void Start () {
         GameObject mainCameraObj = GameObject.Find ("Main Camera");
@@ -25,8 +27,14 @@ public class GameScene : MonoBehaviour {
         nextEnemySpawnTime = Time.time + enemySpawnInterval;
         nextPowerUpSpawnTime = Time.time + powerUpSpawnInterval;
 
+        // シーンが遷移してしまったときに非同期タスクを終了するためのtoken
+        cancellationTokenSource = new CancellationTokenSource();
     }
     
+    void OnDisable() {
+        cancellationTokenSource.Cancel();
+    }
+
     // Update is called once per frame
     void Update () {
         var t = Time.time;
@@ -55,12 +63,17 @@ public class GameScene : MonoBehaviour {
             spawnY = screenLeftBottom.y + (screenRightTop.y - screenLeftBottom.y) * 0.2f;
         }
         var spawnPoint = new Vector3(screenRightTop.x, spawnY, 0);
-
+        var token = cancellationTokenSource.Token;
         Task.Run(async() => {
             for (int i = 0; i < count; i++) {
+                if (token.IsCancellationRequested) {
+                    return;
+                }
                 context.Post((state) => {
+                    if (token.IsCancellationRequested) {
+                        return;
+                    }
                     Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
-
                 }, null);
                 await Task.Delay(700);
             } 
