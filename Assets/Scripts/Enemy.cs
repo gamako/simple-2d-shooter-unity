@@ -12,9 +12,13 @@ public class Enemy : MonoBehaviour {
 
 	private Renderer[] renderers;
 
+    [SerializeField] private GameObject soundEffectObj;
+    private SoundEffect soundEffect;
+    
     void Start () {
 		this.renderers = GetComponentsInChildren<Renderer>();
 		particle = particleObject.GetComponent<ParticleSystem>();
+        soundEffect = soundEffectObj.GetComponent<SoundEffect>();
     }
     
     void Update () {
@@ -39,5 +43,6 @@ public class Enemy : MonoBehaviour {
         particleObject.transform.localPosition = transform.localPosition;
 
         Destroy(this.gameObject);
+        soundEffect.playBomb();
     }
 }

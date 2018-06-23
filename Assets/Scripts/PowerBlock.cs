@@ -29,6 +29,9 @@ public class PowerBlock : MonoBehaviour {
     [SerializeField] private Sprite spriteTripleShot;
     [SerializeField] private Sprite spriteOption;
 
+   [SerializeField] private GameObject soundEffectObj;
+    private SoundEffect soundEffect;
+
     public enum PoweUpType {
         Plain,
         SpeedUp,
@@ -44,6 +47,8 @@ public class PowerBlock : MonoBehaviour {
 
 
     void Start() {
+        soundEffect = soundEffectObj.GetComponent<SoundEffect>();
+
         isRolling = false;
         shotCount = 0;
 
@@ -107,6 +112,7 @@ public class PowerBlock : MonoBehaviour {
             break;
         }
 
+        soundEffect.playItemShot();
     }
 
     void OnEndRolling() {

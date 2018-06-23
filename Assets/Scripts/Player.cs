@@ -27,6 +27,9 @@ public class Player : MonoBehaviour {
 	[SerializeField] GameObject particleObject;
     ParticleSystem particle;
 
+    [SerializeField] private GameObject soundEffectObj;
+    private SoundEffect soundEffect;
+
     enum ShotType {
         Normal,
         Twin,
@@ -35,6 +38,7 @@ public class Player : MonoBehaviour {
 
     void Start () {
 		particle = particleObject.GetComponent<ParticleSystem>();
+        soundEffect = soundEffectObj.GetComponent<SoundEffect>();
 
         fireAxis = new AxisChange("Fire1");
         mainCamera = mainCameraObj.GetComponent<Camera>();
@@ -105,6 +109,7 @@ public class Player : MonoBehaviour {
         fishOptions.ForEach(o => {
             o.shot();
         });
+        soundEffect.playShot();
     }
 
     void PowerUp(PowerBlock po) {
@@ -112,18 +117,23 @@ public class Player : MonoBehaviour {
 
         switch (type) {
             case PowerBlock.PoweUpType.Plain:
+                soundEffect.playPowerUp1();
                 break;
             case PowerBlock.PoweUpType.SpeedUp:
                 Speed += 0.5f;
+                soundEffect.playPowerUp2();
                 break;
             case PowerBlock.PoweUpType.TwinShot:
                 shotMode = ShotType.Twin;
+                soundEffect.playPowerUp2();
                 break;
             case PowerBlock.PoweUpType.TripleShot:
                 shotMode = ShotType.Triple;
+                soundEffect.playPowerUp2();
                 break;
             case PowerBlock.PoweUpType.Option:
                 createOption();
+                soundEffect.playPowerUp2();
                 break;
         }
     }
