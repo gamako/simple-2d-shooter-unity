@@ -30,6 +30,9 @@ public class Shot : MonoBehaviour {
 
 			// 自分も削除
 			Destroy(this.gameObject);
+
+			GameSystemData.Instance.Score.Value += 100;
+
 		} else if (other.tag == "PowerUp") {
 
 			PowerBlock p = other.GetComponent<PowerBlock>();

@@ -118,6 +118,7 @@ public class Player : MonoBehaviour {
         switch (type) {
             case PowerBlock.PoweUpType.Plain:
                 soundEffect.playPowerUp1();
+                GameSystemData.Instance.Score.Value += 100;
                 break;
             case PowerBlock.PoweUpType.SpeedUp:
                 Speed += 0.5f;
