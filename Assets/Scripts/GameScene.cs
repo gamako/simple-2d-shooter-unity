@@ -1,8 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
+using TMPro;
+using DG.Tweening;
+using UniRx;
+using MyExt;
 
 public class GameScene : MonoBehaviour {
 
@@ -24,11 +29,16 @@ public class GameScene : MonoBehaviour {
     void Start () {
         GameObject mainCameraObj = GameObject.Find ("Main Camera");
         mainCamera = mainCameraObj.GetComponent<Camera>();
+        levelText = levelTextObj.GetComponent<TextMeshProUGUI>();
+
         nextEnemySpawnTime = Time.time + enemySpawnInterval;
         nextPowerUpSpawnTime = Time.time + powerUpSpawnInterval;
 
         // シーンが遷移してしまったときに非同期タスクを終了するためのtoken
         cancellationTokenSource = new CancellationTokenSource();
+
+        startPlayerStartDemo();
+        startLevelStartDemo();
     }
     
     void OnDisable() {
@@ -44,8 +54,32 @@ public class GameScene : MonoBehaviour {
         }
         if (t > nextPowerUpSpawnTime) {
             nextPowerUpSpawnTime = t + powerUpSpawnInterval;
-            spawnPoweUp();
+            spawnPowerUp();
         }
+    }
+    [SerializeField] private GameObject levelTextObj;
+    private TextMeshProUGUI levelText;
+
+    void startPlayerStartDemo() {
+        // プレイヤー初期位置
+        var starPosition = mainCamera.ViewportToWorldPoint(new Vector2(-0.2f, 0.5f));
+        player.transform.position = new Vector3(starPosition.x, starPosition.y, 0);
+        // プレイヤーが左から出てくる動き
+        player.transform.DOMoveX(0, 1f);
+    }
+
+    void startLevelStartDemo() {
+        levelText.enabled = true;
+        levelText.color = Color.white;
+        
+        levelText.rectTransform.setAnchorRangeX(1.5f,  2.5f);
+
+        DOTween.Sequence()
+            .Append(levelText.rectTransform.DOAnchorMinX(0, 0.5f).SetEase(Ease.OutCubic))
+            .Join(levelText.rectTransform.DOAnchorMaxX(1, 0.5f).SetEase(Ease.OutCubic))
+            .AppendInterval(0.5f)
+            .Append(levelText.rectTransform.DOAnchorMinX(-1, 0.5f).SetEase(Ease.InCubic))
+            .Join(levelText.rectTransform.DOAnchorMaxX(0, 0.5f).SetEase(Ease.InCubic));
     }
 
     void spawnThree(int count) {
@@ -80,11 +114,11 @@ public class GameScene : MonoBehaviour {
         });
     }
 
-    void spawnPoweUp() {
+    void spawnPowerUp() {
         var screenRightTop = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
         var screenLeftBottom = mainCamera.ViewportToWorldPoint(new Vector2(0,0));
 
-        var y = Random.Range(0, 1.0f);
+        var y = UnityEngine.Random.Range(0, 1.0f);
         var spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
         spawnPoint.z = 0;
         Instantiate (powerUpPrefab, spawnPoint, Quaternion.identity);
