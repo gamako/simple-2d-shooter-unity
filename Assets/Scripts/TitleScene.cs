@@ -14,12 +14,20 @@ public class TitleScene : MonoBehaviour {
     // Use this for initialization
     void Start () {
         axis = new AxisChange("Fire1");
+        buttonOnce = false;
     }
+
+    // 一度しかボタンの処理を行わないためのフラグ
+    bool buttonOnce;
 
     // Update is called once per frame
     void Update () {
         axis.Update();
         if (axis.ChangePositive) {
+            if (buttonOnce) {
+                return;
+            }
+            buttonOnce = true;
             GameObject o = GameObject.Find("PushAnyButton");
             if (o != null) {
                 var flasher = o.GetComponent<FlashTextMeshProUGUI>();
@@ -28,26 +36,15 @@ public class TitleScene : MonoBehaviour {
 
                     var context = SynchronizationContext.Current;
 
-                    Debug.Log("ここはメインスレッド" + Thread.CurrentThread.ManagedThreadId);
-                    
-                    // Task.RunはTaskを返す
-                    // 戻り値のTaskを捨てると、結果を待たずに捨てることを意味する
-                    // asyncメソッドの中でawait Task.Run(...)とすると、async/awaitの非同期で結果待ちして、継続処理を行う
-                    // Task.Waitを使うと同期的に待つ
-                    // （UIスレッドで行うのであれば、UIスレッドを待たせることになるので使い所は限られる）
-                    Task.Run(async() => {
-                        Debug.Log("メインスレッド以外で実行" + Thread.CurrentThread.ManagedThreadId);
-                        await Task.Delay(2000);
-                        Debug.Log("メインスレッド以外で実行" + Thread.CurrentThread.ManagedThreadId);
+                    var cancellationTokenSource = new CancellationTokenSource();
 
-                        // Unity側に触る場合はメインスレッドである必要がある
-                        context.Post((state) => {
-                            Debug.Log("メインスレッドで実行" + Thread.CurrentThread.ManagedThreadId);
-                            SceneManager.LoadScene("GameScene");
-                            
-                            // 他の経路から遷移してしまう場合は、同時に起きないようにする必要があるだろう
-                        }, null);
-                    });
+                    // メインスレッド2秒後に処理を行う
+                    // タスクの終わりは待たない
+                    new Task(async() => {
+                        await Task.Delay(2000);
+                        SceneManager.LoadScene("GameScene");
+                    }, cancellationTokenSource.Token).Start(TaskScheduler.FromCurrentSynchronizationContext());
+
                 }
             }
         }
