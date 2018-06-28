@@ -74,6 +74,7 @@ public class GameScene : MonoBehaviour {
         
         levelText.rectTransform.setAnchorRangeX(1.5f,  2.5f);
 
+        // レベル表示が右から出てきて左に去って行く動き
         DOTween.Sequence()
             .Append(levelText.rectTransform.DOAnchorMinX(0, 0.5f).SetEase(Ease.OutCubic))
             .Join(levelText.rectTransform.DOAnchorMaxX(1, 0.5f).SetEase(Ease.OutCubic))
