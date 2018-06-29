@@ -14,11 +14,17 @@ public class TitleScene : MonoBehaviour {
     // Use this for initialization
     void Start () {
         axis = new AxisChange("Fire1");
+        cancellationTokenSource = new CancellationTokenSource();
         buttonOnce = false;
+    }
+
+    void OnDestroy() {
+        cancellationTokenSource.Cancel();
     }
 
     // 一度しかボタンの処理を行わないためのフラグ
     bool buttonOnce;
+    CancellationTokenSource cancellationTokenSource;
 
     // Update is called once per frame
     void Update () {
@@ -35,8 +41,6 @@ public class TitleScene : MonoBehaviour {
                     flasher.interval = 0.2f;
 
                     var context = SynchronizationContext.Current;
-
-                    var cancellationTokenSource = new CancellationTokenSource();
 
                     // メインスレッド2秒後に処理を行う
                     // タスクの終わりは待たない
