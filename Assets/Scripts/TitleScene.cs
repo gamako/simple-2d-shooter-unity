@@ -27,7 +27,7 @@ public class TitleScene : MonoBehaviour {
     CancellationTokenSource cancellationTokenSource;
 
     // Update is called once per frame
-    void Update () {
+    async void Update () {
         axis.Update();
         if (axis.ChangePositive) {
             if (buttonOnce) {
@@ -40,15 +40,10 @@ public class TitleScene : MonoBehaviour {
                 if (flasher != null) {
                     flasher.interval = 0.2f;
 
-                    var context = SynchronizationContext.Current;
-
                     // メインスレッド2秒後に処理を行う
                     // タスクの終わりは待たない
-                    new Task(async() => {
-                        await Task.Delay(2000);
-                        SceneManager.LoadScene("GameScene");
-                    }, cancellationTokenSource.Token).Start(TaskScheduler.FromCurrentSynchronizationContext());
-
+                    await Task.Delay(2000);
+                    SceneManager.LoadScene("GameScene");
                 }
             }
         }
