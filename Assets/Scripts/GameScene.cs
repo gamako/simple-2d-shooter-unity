@@ -12,53 +12,60 @@ using MyExt;
 public class GameScene : MonoBehaviour {
 
     private Camera mainCamera;
-    private float nextEnemySpawnTime;
-    private float nextPowerUpSpawnTime;
-
-    public float enemySpawnInterval = 3;
-    public float powerUpSpawnInterval = 4;
 
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private GameObject powerUpPrefab;
 
     [SerializeField] private GameObject player;
 
-    CancellationTokenSource cancellationTokenSource;
+    [SerializeField] private GameObject levelTextObj;
+    private TextMeshProUGUI levelText;
+
+    private List<CancellationTokenSource> cancelOnDisable = new List<CancellationTokenSource>();
+
+    int level;
 
     // Use this for initialization
-    void Start () {
+    async void Start () {
         GameObject mainCameraObj = GameObject.Find ("Main Camera");
         mainCamera = mainCameraObj.GetComponent<Camera>();
         levelText = levelTextObj.GetComponent<TextMeshProUGUI>();
 
-        nextEnemySpawnTime = Time.time + enemySpawnInterval;
-        nextPowerUpSpawnTime = Time.time + powerUpSpawnInterval;
-
-        // シーンが遷移してしまったときに非同期タスクを終了するためのtoken
-        cancellationTokenSource = new CancellationTokenSource();
-
         startPlayerStartDemo();
-        startLevelStartDemo();
+
+        level = 0;
+        while (true) {
+            try {
+                level += 1;
+
+                startLevelStartDemo();
+
+                // レベルの終了条件を考える
+                // - 時間の場合
+                // - 特定の敵が出現して、倒した
+                //   - なんらかの条件で遷移するステート
+
+                await levelSystem();
+
+            } catch (TaskCanceledException) {
+                Debug.Log("Canceled");
+                break;
+            }
+        }
     }
     
     void OnDisable() {
-        cancellationTokenSource.Cancel();
+        // Cancel中にリスト(cancelOnDisable)を更新することがあってはならない
+        cancelOnDisable.ForEach((c) => {
+            Debug.Log("OnDisable: Cancel");
+            c.Cancel();
+        });
+        cancelOnDisable.Clear();
     }
 
     // Update is called once per frame
     void Update () {
-        var t = Time.time;
-        if (t > nextEnemySpawnTime) {
-            nextEnemySpawnTime = t + enemySpawnInterval;
-            spawnThree(3);
-        }
-        if (t > nextPowerUpSpawnTime) {
-            nextPowerUpSpawnTime = t + powerUpSpawnInterval;
-            spawnPowerUp();
-        }
     }
-    [SerializeField] private GameObject levelTextObj;
-    private TextMeshProUGUI levelText;
 
     void startPlayerStartDemo() {
         // プレイヤー初期位置
@@ -71,6 +78,7 @@ public class GameScene : MonoBehaviour {
     void startLevelStartDemo() {
         levelText.enabled = true;
         levelText.color = Color.white;
+        levelText.text = $"LEVEL {level}";
         
         levelText.rectTransform.setAnchorRangeX(1.5f,  2.5f);
 
@@ -83,7 +91,43 @@ public class GameScene : MonoBehaviour {
             .Join(levelText.rectTransform.DOAnchorMaxX(0, 0.5f).SetEase(Ease.InCubic));
     }
 
-    void spawnThree(int count) {
+    async Task levelSystem() {
+
+        int currentLevel = this.level;
+        Debug.Log($"level {currentLevel}");
+
+        var cancelation = new CancellationTokenSource();
+        cancelOnDisable.Add(cancelation);
+
+        // パワーアップアイテムを定期的に出現させる（終わりを待たない）
+        spawnPowerUpCyclically(1f, 5f, cancelation.Token);
+        //   .Start(TaskScheduler.FromCurrentSynchronizationContext());
+
+        // 敵を倒すなどのイベントを待つときはTaskCompletionSourceを待つことで実現できる
+        // var tcs = new TaskCompletionSource<bool>();
+        // Task<bool> t = tcs.Task;
+        // 
+        // await Task.Run(async() => {
+        //     await Task.Delay(2000);
+        //     tcs.SetResult(true);
+        // });
+        // var r = await t;
+        await spawnEnemySerialCyclically(level + 1, level, 2, 2, cancelation.Token);
+
+        // 終わりを待たないタスクを終了させる
+        cancelation.Cancel();
+        cancelOnDisable.Remove(cancelation);
+    }
+
+    async Task spawnEnemySerialCyclically(int count, int roundCount, float startDelay, float interval, CancellationToken token) {
+        await Task.Delay(TimeSpan.FromMilliseconds(1000 * startDelay), token);
+        for (int i = 0; i < roundCount; i++) {
+            await spawnEnemySerial(count, token);
+            await Task.Delay(TimeSpan.FromMilliseconds(1000 * interval), token);
+        }
+    }
+
+    async Task spawnEnemySerial(int count, CancellationToken token) {
         var context = SynchronizationContext.Current;
 
         var screenRightTop = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
@@ -98,21 +142,21 @@ public class GameScene : MonoBehaviour {
             spawnY = screenLeftBottom.y + (screenRightTop.y - screenLeftBottom.y) * 0.2f;
         }
         var spawnPoint = new Vector3(screenRightTop.x, spawnY, 0);
-        var token = cancellationTokenSource.Token;
-        Task.Run(async() => {
-            for (int i = 0; i < count; i++) {
-                if (token.IsCancellationRequested) {
-                    return;
-                }
-                context.Post((state) => {
-                    if (token.IsCancellationRequested) {
-                        return;
-                    }
-                    Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
-                }, null);
-                await Task.Delay(700);
-            } 
-        });
+
+        for (int i = 0; i < count; i++) {
+            Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
+            await Task.Delay(700);
+        }
+    }
+
+    // パワーアップアイテムを定期的に出現させる非同期メソッド
+    async Task spawnPowerUpCyclically(float startDelay, float intervalSec, CancellationToken token) {
+        await Task.Delay(TimeSpan.FromMilliseconds(1000 * startDelay), token);
+
+        while(true) {
+            spawnPowerUp();
+            await Task.Delay(TimeSpan.FromMilliseconds(1000 * intervalSec), token);
+        }
     }
 
     void spawnPowerUp() {
