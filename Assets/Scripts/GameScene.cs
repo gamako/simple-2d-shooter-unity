@@ -40,15 +40,10 @@ public class GameScene : MonoBehaviour {
 
                 startLevelStartDemo();
 
-                // レベルの終了条件を考える
-                // - 時間の場合
-                // - 特定の敵が出現して、倒した
-                //   - なんらかの条件で遷移するステート
-
                 await levelSystem();
 
             } catch (TaskCanceledException) {
-                Debug.Log("Canceled");
+                // 途中でシーンが変わったり、エディタに戻ったりした場合はキャンセルで抜けてくる
                 break;
             }
         }
@@ -57,7 +52,6 @@ public class GameScene : MonoBehaviour {
     void OnDisable() {
         // Cancel中にリスト(cancelOnDisable)を更新することがあってはならない
         cancelOnDisable.ForEach((c) => {
-            Debug.Log("OnDisable: Cancel");
             c.Cancel();
         });
         cancelOnDisable.Clear();
@@ -101,7 +95,6 @@ public class GameScene : MonoBehaviour {
 
         // パワーアップアイテムを定期的に出現させる（終わりを待たない）
         spawnPowerUpCyclically(1f, 5f, cancelation.Token);
-        //   .Start(TaskScheduler.FromCurrentSynchronizationContext());
 
         // 敵を倒すなどのイベントを待つときはTaskCompletionSourceを待つことで実現できる
         // var tcs = new TaskCompletionSource<bool>();
@@ -113,6 +106,8 @@ public class GameScene : MonoBehaviour {
         // });
         // var r = await t;
         await spawnEnemySerialCyclically(level + 1, level, 2, 2, cancelation.Token);
+
+        await Task.Delay(TimeSpan.FromMilliseconds(1000 * 5), cancelation.Token);
 
         // 終わりを待たないタスクを終了させる
         cancelation.Cancel();
