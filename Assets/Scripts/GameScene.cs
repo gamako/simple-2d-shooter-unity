@@ -105,7 +105,8 @@ public class GameScene : MonoBehaviour {
         //     tcs.SetResult(true);
         // });
         // var r = await t;
-        await spawnEnemySerialCyclically(level + 1, level, 2, 2, cancelation.Token);
+        // await spawnEnemySerialCyclically(level + 1, level, 2, 2, cancelation.Token);
+        await levelEnemy(cancelation.Token);
 
         await Task.Delay(TimeSpan.FromMilliseconds(1000 * 5), cancelation.Token);
 
@@ -114,33 +115,87 @@ public class GameScene : MonoBehaviour {
         cancelOnDisable.Remove(cancelation);
     }
 
-    async Task spawnEnemySerialCyclically(int count, int roundCount, float startDelay, float interval, CancellationToken token) {
-        await Task.Delay(TimeSpan.FromMilliseconds(1000 * startDelay), token);
-        for (int i = 0; i < roundCount; i++) {
-            await spawnEnemySerial(count, token);
-            await Task.Delay(TimeSpan.FromMilliseconds(1000 * interval), token);
+    async Task levelEnemy(CancellationToken token) {
+        var l = level % 2;
+        Debug.Log("l " + l);
+        switch(l) {
+        case 0:
+            await level2Enemy(token);
+            break;
+        case 1:
+            await level1Enemy(token);
+            break;
         }
     }
 
-    async Task spawnEnemySerial(int count, CancellationToken token) {
-        var context = SynchronizationContext.Current;
+    async Task level1Enemy(CancellationToken token) {
+        int count = 3;
+        int roundCount = 2 + level;
+        float startDelay = 3;
+        float interval = 3;
+        float speed = (float)level * 0.5f + 1.0f;
 
-        var screenRightTop = mainCamera.ViewportToWorldPoint(new Vector2(1,1));
-        var screenLeftBottom = mainCamera.ViewportToWorldPoint(new Vector2(0,0));
-
-        var verticalCenter = (screenRightTop.y + screenLeftBottom.y)/2;
-
-        float spawnY;
-        if (player.transform.position.y < verticalCenter) {
-            spawnY = screenLeftBottom.y + (screenRightTop.y - screenLeftBottom.y) * 0.8f;
-        } else {
-            spawnY = screenLeftBottom.y + (screenRightTop.y - screenLeftBottom.y) * 0.2f;
+        await TaskExt.Delay(startDelay, token);
+        for (int i = 0; i < roundCount; i++) {
+            await spawnEnemy1Serial(count, speed, token);
+            await TaskExt.Delay(interval, token);
         }
-        var spawnPoint = new Vector3(screenRightTop.x, spawnY, 0);
+    }
+
+    async Task level2Enemy(CancellationToken token) {
+        int count = 2 + level;
+        int roundCount =  2 + level;
+        float startDelay = 3;
+        float interval = 3;
+        float speed = (float)level * 0.5f + 1.0f;
+
+        await TaskExt.Delay(startDelay, token);
+        for (int i = 0; i < roundCount; i++) {
+            await spawnEnemy2Serial(count, speed, token);
+            await TaskExt.Delay(interval, token);
+        }
+    }
+
+    async Task spawnEnemy1Serial(int count, float speed, CancellationToken token) {
+        var verticalCenter = mainCamera.ViewportToWorldPoint(new Vector2(1,0.5f)).y;
+
+        Vector3 spawnPoint;
+        if (player.transform.position.y < verticalCenter) {
+            spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,0.8f));
+        } else {
+            spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,0.2f));
+        }
+        spawnPoint.z = 0;
 
         for (int i = 0; i < count; i++) {
-            Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
-            await Task.Delay(700);
+            var enemy_ = Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
+            var enemy = enemy_.GetComponent<Enemy>();
+            enemy.Delta *= speed;
+            
+            float delayTime = 0.7f / speed;
+            await TaskExt.Delay(delayTime, token);
+        }
+    }
+    async Task spawnEnemy2Serial(int count, float speed, CancellationToken token) {
+
+        for (int i = 0; i < count; i++) {
+            var y = UnityEngine.Random.Range(0, 1.0f);
+            Vector3 spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
+            spawnPoint.z = 0;
+
+            var enemy_ = Instantiate (enemyPrefab, spawnPoint, Quaternion.identity);
+            var enemy = enemy_.GetComponent<Enemy>();
+
+            Vector3 delta = new Vector3(-3, 0);
+            if (player.transform.position.y > spawnPoint.y) {
+                delta = Quaternion.Euler(0, 0, -25) * delta;
+            } else {
+                delta = Quaternion.Euler(0, 0, 25) * delta;
+            }
+            enemy.Delta = delta * speed;
+
+            float delayTime = 0.7f / speed;
+            await TaskExt.Delay(delayTime, token);
         }
     }
 
@@ -164,4 +219,5 @@ public class GameScene : MonoBehaviour {
         Instantiate (powerUpPrefab, spawnPoint, Quaternion.identity);
          
     }
+
 }

@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour {
 	public GameObject particleObject;
 	ParticleSystem particle;
 
-    public Vector3 delta = new Vector3(-3, 0);
+    public Vector3 Delta = new Vector3(-3, 0);
 
 	private Renderer[] renderers;
 
@@ -25,7 +25,7 @@ public class Enemy : MonoBehaviour {
         var dletaTime = Time.deltaTime;
 
         // 移動
-        transform.localPosition += delta * dletaTime;
+        transform.localPosition += Delta * dletaTime;
     }
 
     void OnTriggerEnter2D(Collider2D other) {
