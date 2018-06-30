@@ -44,8 +44,6 @@ public class Player : MonoBehaviour {
         fireAxis = new AxisChange("Fire1");
         mainCamera = mainCameraObj.GetComponent<Camera>();
         fishOptions = new List<FishOption>();
-
-        createOption();
     }
 
     void Update () {
