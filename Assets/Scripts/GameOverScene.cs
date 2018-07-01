@@ -4,31 +4,25 @@ using UnityEngine;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
+using MyExt;
 
 public class GameOverScene : MonoBehaviour {
 
     AxisChange fireAxis;
     CancellationTokenSource cancellationTokenSource;
 
-    void Start () {
+    async void Start () {
         fireAxis = new AxisChange("Fire1");
         cancellationTokenSource = new CancellationTokenSource();
 
         var context = SynchronizationContext.Current;
         var token = cancellationTokenSource.Token;
 
-        Task.Run(async() => {
-            await Task.Delay(21000);
-            if (token.IsCancellationRequested) {
-                return;
-            }
-            context.Post((state) => {
-                if (token.IsCancellationRequested) {
-                    return;
-                }
-                SceneManager.LoadScene("TitleScene");
-            }, null);
-        });
+        try {
+            await AwaitHelper.Delay(21f, token);
+            SceneManager.LoadScene("TitleScene");
+        } catch (TaskCanceledException) {
+        }
     }
     
     void OnDisable() {

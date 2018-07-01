@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
+using MyExt;
 
 public class Player : MonoBehaviour {
 
@@ -153,7 +154,7 @@ public class Player : MonoBehaviour {
         fishOption.positionNum = fishOptions.Count * 15;
     }
 
-    public void OnDamage() {
+    public async void OnDamage() {
         particle.Emit(100);
         particleObject.transform.localPosition = transform.localPosition;
 
@@ -166,11 +167,7 @@ public class Player : MonoBehaviour {
 
         var context = SynchronizationContext.Current;
 
-        Task.Run(async() => {
-            await Task.Delay(2000);
-            context.Post((state) => {
-                SceneManager.LoadScene("GameOverScene");
-            }, null);
-        });
+        await AwaitHelper.Delay(2f);
+        SceneManager.LoadScene("GameOverScene");
     }
 }
