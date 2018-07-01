@@ -1,0 +1,13 @@
+{
+"companyName": "DefaultCompany",
+"productName": "simple-2d-shooter",
+"dataUrl": "simple-2d-shooter-webgl.data.unityweb",
+"asmCodeUrl": "simple-2d-shooter-webgl.asm.code.unityweb",
+"asmMemoryUrl": "simple-2d-shooter-webgl.asm.memory.unityweb",
+"asmFrameworkUrl": "simple-2d-shooter-webgl.asm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20"
+}
