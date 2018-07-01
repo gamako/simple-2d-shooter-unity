@@ -108,7 +108,7 @@ public class GameScene : MonoBehaviour {
         // await spawnEnemySerialCyclically(level + 1, level, 2, 2, cancelation.Token);
         await levelEnemy(cancelation.Token);
 
-        await Task.Delay(TimeSpan.FromMilliseconds(1000 * 5), cancelation.Token);
+        await AwaitHelper.Delay(5, cancelation.Token);
 
         // 終わりを待たないタスクを終了させる
         cancelation.Cancel();
@@ -135,10 +135,10 @@ public class GameScene : MonoBehaviour {
         float interval = 3;
         float speed = (float)level * 0.5f + 1.0f;
 
-        await TaskExt.Delay(startDelay, token);
+        await AwaitHelper.Delay(startDelay, token);
         for (int i = 0; i < roundCount; i++) {
             await spawnEnemy1Serial(count, speed, token);
-            await TaskExt.Delay(interval, token);
+            await AwaitHelper.Delay(interval, token);
         }
     }
 
@@ -149,10 +149,10 @@ public class GameScene : MonoBehaviour {
         float interval = 3;
         float speed = (float)level * 0.5f + 1.0f;
 
-        await TaskExt.Delay(startDelay, token);
+        await AwaitHelper.Delay(startDelay, token);
         for (int i = 0; i < roundCount; i++) {
             await spawnEnemy2Serial(count, speed, token);
-            await TaskExt.Delay(interval, token);
+            await AwaitHelper.Delay(interval, token);
         }
     }
 
@@ -173,7 +173,7 @@ public class GameScene : MonoBehaviour {
             enemy.Delta *= speed;
             
             float delayTime = 0.7f / speed;
-            await TaskExt.Delay(delayTime, token);
+            await AwaitHelper.Delay(delayTime, token);
         }
     }
     async Task spawnEnemy2Serial(int count, float speed, CancellationToken token) {
@@ -195,17 +195,19 @@ public class GameScene : MonoBehaviour {
             enemy.Delta = delta * speed;
 
             float delayTime = 0.7f / speed;
-            await TaskExt.Delay(delayTime, token);
+            await AwaitHelper.Delay(delayTime, token);
         }
     }
 
     // パワーアップアイテムを定期的に出現させる非同期メソッド
     async Task spawnPowerUpCyclically(float startDelay, float intervalSec, CancellationToken token) {
-        await Task.Delay(TimeSpan.FromMilliseconds(1000 * startDelay), token);
+        Debug.Log("spawnPowerUpCyclically");
+        await AwaitHelper.Delay(startDelay, token);
 
         while(true) {
+            Debug.Log("spawnPowerUpCyclically spawn");
             spawnPowerUp();
-            await Task.Delay(TimeSpan.FromMilliseconds(1000 * intervalSec), token);
+            await AwaitHelper.Delay(intervalSec, token);
         }
     }
 
@@ -217,7 +219,6 @@ public class GameScene : MonoBehaviour {
         var spawnPoint = mainCamera.ViewportToWorldPoint(new Vector2(1,y));
         spawnPoint.z = 0;
         Instantiate (powerUpPrefab, spawnPoint, Quaternion.identity);
-         
     }
 
 }

@@ -1,9 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UniRx;
+using MyExt;
 
 public class TitleScene : MonoBehaviour {
 
@@ -41,10 +44,9 @@ public class TitleScene : MonoBehaviour {
                 var flasher = o.GetComponent<FlashTextMeshProUGUI>();
                 if (flasher != null) {
                     flasher.interval = 0.2f;
-
-                    // メインスレッド2秒後に処理を行う
-                    // タスクの終わりは待たない
-                    await Task.Delay(2000);
+                    // メインスレッドで2秒後に処理を行う
+                    await AwaitHelper.Delay(2f);
+                    Debug.Log("load scene");
                     SceneManager.LoadScene("GameScene");
                 }
             }
