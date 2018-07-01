@@ -16,6 +16,8 @@ public class TitleScene : MonoBehaviour {
         axis = new AxisChange("Fire1");
         cancellationTokenSource = new CancellationTokenSource();
         buttonOnce = false;
+
+        GameSystemData.Instance.Score.Value = 0;
     }
 
     void OnDestroy() {
