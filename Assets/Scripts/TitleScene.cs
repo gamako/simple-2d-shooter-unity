@@ -51,6 +51,9 @@ public class TitleScene : MonoBehaviour {
                 }
             }
         }
+        if (Input.GetKeyDown(KeyCode.Tab)) {
+            SceneManager.LoadScene("KeyCheckScene");
+        }
     }
 
 
